@@ -277,7 +277,7 @@ module store_unit
     // don't shift the data if we are going to perform an AMO as we still need to operate on this data
     st_data_n = ((CVA6Cfg.RVA && instr_is_amo) ? endian_data[CVA6Cfg.XLEN-1:0] :
                  data_align(lsu_ctrl_i.vaddr[2:0], {{64 - CVA6Cfg.XLEN{1'b0}}, endian_data}));
-    st_data_size_n = extract_transfer_size(lsu_ctrl_i.operation);
+    st_data_size_n = extract_transfer_size(CVA6Cfg, lsu_ctrl_i.operation);
     // save AMO op for next cycle
     if (CVA6Cfg.RVA) begin
       case (lsu_ctrl_i.operation)

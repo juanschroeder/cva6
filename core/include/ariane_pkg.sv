@@ -789,7 +789,9 @@ package ariane_pkg;
   // ----------------------
   // Extract Bytes from Op
   // ----------------------
-  function automatic logic [1:0] extract_transfer_size(fu_op op);
+  function automatic logic [1:0] extract_transfer_size(
+        config_pkg::cva6_cfg_t Cfg,
+        fu_op op);
     case (op)
       LD, HLV_D, SD, HSV_D, FLD, FSD,
             AMO_LRD,   AMO_SCD,
@@ -813,7 +815,8 @@ package ariane_pkg;
       LH, LHU, HLV_H, HLV_HU, HLVX_HU, SH, HSV_H, FLH, FSH: return 2'b01;
       LB, LBU, HLV_B, HLV_BU, SB, HSV_B, FLB, FSB:          return 2'b00;
       CBO_CLEAN, CBO_FLUSH, CBO_INVAL:                      return 2'b00;
-      default:                                              return 2'b11;
+      default:
+        return Cfg.IS_XLEN64 ? 2'b11 : 2'b10;    
     endcase
   endfunction
   // ----------------------

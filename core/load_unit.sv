@@ -643,16 +643,25 @@ module load_unit
   // check invalid offsets, but only issue a warning as these conditions actually trigger a load address misaligned exception
   addr_offset0 :
   assert property (@(posedge clk_i) disable iff (~rst_ni)
-        ldbuf_w |->  (ldbuf_wdata.operation inside {ariane_pkg::LW, ariane_pkg::LWU}) |-> ldbuf_wdata.address_offset < 5)
-  else $fatal(1, "invalid address offset used with {LW, LWU}");
+        (ldbuf_w && !lsu_ctrl_i.is_speculative_load
+            && (ldbuf_wdata.operation inside {ariane_pkg::LW, ariane_pkg::LWU})
+        )
+        |->   ldbuf_wdata.address_offset < 5)
+  else $warning("invalid address offset used with {LW, LWU}");
   addr_offset1 :
   assert property (@(posedge clk_i) disable iff (~rst_ni)
-        ldbuf_w |->  (ldbuf_wdata.operation inside {ariane_pkg::LH, ariane_pkg::LHU}) |-> ldbuf_wdata.address_offset < 7)
-  else $fatal(1, "invalid address offset used with {LH, LHU}");
+        (ldbuf_w && !lsu_ctrl_i.is_speculative_load
+            && (ldbuf_wdata.operation inside {ariane_pkg::LW, ariane_pkg::LWU})
+        )
+      |->  (ldbuf_wdata.operation inside {ariane_pkg::LH, ariane_pkg::LHU}) |-> ldbuf_wdata.address_offset < 7)
+  else $warning(1, "invalid address offset used with {LH, LHU}");
   addr_offset2 :
   assert property (@(posedge clk_i) disable iff (~rst_ni)
-        ldbuf_w |->  (ldbuf_wdata.operation inside {ariane_pkg::LB, ariane_pkg::LBU}) |-> ldbuf_wdata.address_offset < 8)
-  else $fatal(1, "invalid address offset used with {LB, LBU}");
+        (ldbuf_w && !lsu_ctrl_i.is_speculative_load
+            && (ldbuf_wdata.operation inside {ariane_pkg::LB, ariane_pkg::LBU})
+        )
+      |->  ldbuf_wdata.address_offset < 8)
+  else $warning(1, "invalid address offset used with {LB, LBU}");
   //pragma translate_on
 
 endmodule
